@@ -1,31 +1,36 @@
-.feedback-form {
-  display: flex;
-  flex-direction: column;
-  max-width: 480px;
-  padding: 12px;
-  background-color: #fff;
-  border: 1px solid rgba(0, 0, 0, 0.12);
-  border-radius: 4px;
-}
+import throttle from 'lodash.throttle';
 
-.feedback-form label {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 16px;
-}
+const emailText = document.querySelector('input');
+const messageText = document.querySelector('textarea');
+const mainForm = document.querySelector('.feedback-form');
 
-.feedback-form button {
-  padding: 8px 12px;
-  font: inherit;
-  cursor: pointer;
-}
+const localStorageKey = 'feedback-form-state';
 
-input,
-textarea {
-  padding: 8px;
-  font: inherit;
-}
+let emailMessage = { email: '', message: '' };
 
-textarea {
-  resize: none;
-}
+const storage = throttle(function () {
+  emailText.addEventListener('input', event => {
+    emailMessage.email = event.currentTarget.value;
+    console.log(emailMessage);
+    localStorage.setItem(localStorageKey, JSON.stringify(emailMessage));
+  });
+  messageText.addEventListener('input', event => {
+    emailMessage.message = event.currentTarget.value;
+    console.log(emailMessage);
+    localStorage.setItem(localStorageKey, JSON.stringify(emailMessage));
+  });
+}, 1000);
+storage();
+
+const parsedInput = JSON.parse(localStorage.getItem(localStorageKey));
+emailText.value = parsedInput.email;
+messageText.value = parsedInput.message;
+
+form.addEventListener('submit', event => {
+  event.preventDefault();
+  localStorage.removeItem(localStorageKey);
+  let newEmailMessage = { email: '', message: '' };
+  newEmailMessage.email = emailText.value;
+  newEmailMessage.message = messageText.value;
+  form.reset();
+});
